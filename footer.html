@@ -1,0 +1,89 @@
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <i class="fas fa-compass"></i>
+                <span>TechPath</span>      
+            </div>
+            <p class="footer-text">Platform referensi skill untuk berbagai industri</p>
+            <div class="footer-links">
+                <a href="landing-page.html">Home</a>
+                <a href="index.html">Explore</a>
+                <a href="landing-page.html#features">Features</a>
+                <a href="landing-page.html#industries">Industries</a>
+            </div>
+            <p class="footer-copyright">© 2025 Industry Skills Reference. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<style>
+.footer {
+    padding: 60px 0 30px;
+    text-align: center;
+    background: var(--dark-bg, #0f172a);
+    border-top: 1px solid var(--border-color, #334155);
+}
+
+.footer-content {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.footer-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: var(--text-primary, #f1f5f9);
+}
+
+.footer-brand i {
+    color: var(--primary-color, #6366f1);
+    font-size: 1.8rem;
+}
+
+.footer-text {
+    color: var(--text-secondary, #94a3b8);
+    margin-bottom: 25px;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.footer-links a {
+    color: var(--text-secondary, #94a3b8);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: var(--primary-color, #6366f1);
+}
+
+.footer-copyright {
+    color: var(--text-secondary, #94a3b8);
+    font-size: 0.9rem;
+    padding-top: 25px;
+    border-top: 1px solid var(--border-color, #334155);
+}
+
+@media (max-width: 768px) {
+    .footer {
+        padding: 40px 0 20px;
+    }
+    
+    .footer-links {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+</style>

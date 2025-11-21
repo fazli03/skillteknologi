@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Carousel xxxXxxx</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0f172a;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 50px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 50px;
+            color: #6366f1;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            padding: 40px 0;
+        }
+
+        .carousel-wrapper {
+            overflow: hidden;
+            position: relative;
+        }
+
+        .carousel-track {
+            display: flex;
+            gap: 20px;
+            transition: transform 0.5s ease;
+        }
+
+        .card {
+            flex: 0 0 150px;
+            height: 200px;
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .card.clone {
+            cursor: default;
+            opacity: 0.8;
+        }
+
+        .card.active {
+            transform: scale(1.2);
+            border-color: #6366f1;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.5);
+            background: #2d3b52;
+            z-index: 10;
+        }
+
+        .card.side {
+            transform: scale(0.9);
+            opacity: 0.6;
+        }
+
+        .card-number {
+            font-size: 48px;
+            font-weight: bold;
+            color: #6366f1;
+            margin-bottom: 10px;
+        }
+
+        .card-label {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #1e293b;
+            border: 2px solid #6366f1;
+            color: #6366f1;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #6366f1;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .info {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: #1e293b;
+            border-radius: 10px;
+        }
+
+        .info p {
+            margin: 5px 0;
+            color: #94a3b8;
+        }
+
+        .info .current {
+            color: #6366f1;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .indicators {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #334155;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator.active {
+            background: #6366f1;
+            width: 30px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Carousel: xxxXxxx</h1>
+
+        <div class="carousel-container">
+            <div class="carousel-wrapper">
+                <div class="carousel-track" id="track">
+                    <!-- Cards akan di-generate oleh JS -->
+                </div>
+            </div>
+
+            <div class="indicators" id="indicators"></div>
+        </div>
+
+        <div class="controls">
+            <button onclick="prev()">←</button>
+            <button onclick="next()">→</button>
+        </div>
+
+        <div class="info">
+            <p>Current Index: <span class="current" id="currentIndex">0</span></p>
+            <p>Total Items: <span id="totalItems">8</span></p>
+            <p>Visual: <span id="visual">xxxXxxx</span></p>
+        </div>
+    </div>
+
+    <script>
+        // Data
+        const items = [
+            { id: 0, name: 'Item 0' },
+            { id: 1, name: 'Item 1' },
+            { id: 2, name: 'Item 2' },
+            { id: 3, name: 'Item 3' },
+            { id: 4, name: 'Item 4' },
+            { id: 5, name: 'Item 5' },
+            { id: 6, name: 'Item 6' },
+            { id: 7, name: 'Item 7' }
+        ];
+
+        let currentIndex = 0;
+        const total = items.length;
+        const numClones = 3; // 3 cards di kiri dan kanan
+        let isTransitioning = false;
+
+        // Initialize
+        function init() {
+            const track = document.getElementById('track');
+            const indicatorsDiv = document.getElementById('indicators');
+            
+            // Create LEFT clone cards (dari akhir array)
+            for (let i = total - numClones; i < total; i++) {
+                const card = createCard(items[i], true, 'left');
+                track.appendChild(card);
+            }
+            
+            // Create MAIN cards
+            items.forEach(item => {
+                const card = createCard(item, false, 'main');
+                track.appendChild(card);
+            });
+            
+            // Create RIGHT clone cards (dari awal array)
+            for (let i = 0; i < numClones; i++) {
+                const card = createCard(items[i], true, 'right');
+                track.appendChild(card);
+            }
+
+            // Create indicators (hanya untuk main cards)
+            items.forEach((item, index) => {
+                const dot = document.createElement('div');
+                dot.className = 'indicator';
+                dot.onclick = () => goTo(index);
+                indicatorsDiv.appendChild(dot);
+            });
+
+            // Listen untuk transition end
+            track.addEventListener('transitionend', handleTransitionEnd);
+
+            updateCarousel(false);
+        }
+
+        // Create card element
+        function createCard(item, isClone, position) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.id = item.id;
+            card.dataset.position = position;
+            if (isClone) {
+                card.classList.add('clone');
+            }
+            card.innerHTML = `
+                <div class="card-number">${item.id}</div>
+                <div class="card-label">${item.name}</div>
+            `;
+            if (!isClone) {
+                card.onclick = () => goTo(item.id);
+            }
+            return card;
+        }
+
+        // Update carousel
+        function updateCarousel(animate = true) {
+            const track = document.getElementById('track');
+            const cards = track.querySelectorAll('.card');
+            const indicators = document.querySelectorAll('.indicator');
+            
+            // Enable/disable transition
+            if (!animate) {
+                track.style.transition = 'none';
+                // Force reflow
+                void track.offsetWidth;
+            } else {
+                track.style.transition = 'transform 0.5s ease';
+            }
+            
+            // Position dari card aktif (dengan memperhitungkan clone di kiri)
+            const activePosition = numClones + currentIndex;
+            
+            // Calculate offset to center active card
+            const cardWidth = 150;
+            const gap = 20;
+            const containerWidth = document.querySelector('.carousel-wrapper').offsetWidth;
+            const centerOffset = (containerWidth / 2) - (cardWidth / 2);
+            const offset = centerOffset - (activePosition * (cardWidth + gap));
+            
+            track.style.transform = `translateX(${offset}px)`;
+            
+            // Update card states
+            cards.forEach((card, index) => {
+                card.classList.remove('active', 'side');
+                
+                const distance = Math.abs(index - activePosition);
+                
+                if (index === activePosition) {
+                    card.classList.add('active');
+                } else if (distance === 1) {
+                    card.classList.add('side');
+                }
+            });
+
+            // Update indicators - normalize index untuk display
+            const normalizedIndex = ((currentIndex % total) + total) % total;
+            indicators.forEach((dot, index) => {
+                dot.classList.toggle('active', index === normalizedIndex);
+            });
+
+            // Update info - normalize index untuk display
+            document.getElementById('currentIndex').textContent = normalizedIndex;
+            updateVisual();
+        }
+
+        // Handle transition end untuk seamless loop
+        function handleTransitionEnd() {
+            // Jika sudah sampai di clone, reset ke main tanpa animasi
+            if (currentIndex >= total || currentIndex < 0) {
+                // Normalize index
+                const normalizedIndex = ((currentIndex % total) + total) % total;
+                
+                // Double requestAnimationFrame untuk ensure browser sudah render
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        currentIndex = normalizedIndex;
+                        updateCarousel(false);
+                        
+                        // Re-enable transition setelah reset
+                        requestAnimationFrame(() => {
+                            const track = document.getElementById('track');
+                            track.style.transition = 'transform 0.5s ease';
+                            isTransitioning = false;
+                        });
+                    });
+                });
+            } else {
+                isTransitioning = false;
+            }
+        }
+
+        // Update visual representation
+        function updateVisual() {
+            let visual = '';
+            for (let i = -3; i <= 3; i++) {
+                const index = (currentIndex + i + total) % total;
+                if (i === 0) {
+                    visual += `[${index}] `;
+                } else {
+                    visual += `${index} `;
+                }
+            }
+            document.getElementById('visual').textContent = visual;
+        }
+
+        // Navigation
+        function next() {
+            if (isTransitioning) return;
+            isTransitioning = true;
+            
+            currentIndex++;
+            updateCarousel(true);
+        }
+
+        function prev() {
+            if (isTransitioning) return;
+            isTransitioning = true;
+            
+            currentIndex--;
+            updateCarousel(true);
+        }
+
+        function goTo(index) {
+            if (isTransitioning) return;
+            isTransitioning = true;
+            
+            currentIndex = index;
+            updateCarousel(true);
+            
+            // Reset transition flag after animation
+            setTimeout(() => {
+                isTransitioning = false;
+            }, 500);
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') prev();
+            if (e.key === 'ArrowRight') next();
+        });
+
+        // Start
+        init();
+    </script>
+</body>
+</html>
